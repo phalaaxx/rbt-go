@@ -50,7 +50,13 @@ func (r RsyncOptions) GetLastBackupTime() (*time.Time, error) {
 	var stats CompletedStats
 	decoder := json.NewDecoder(File)
 	if err := decoder.Decode(&stats); err != nil {
-		return nil, err
+		// can't decode json, use file stat instead
+		if st, err := File.Stat(); err != nil {
+			return nil, err
+		} else {
+			mtime := st.ModTime()
+			return &mtime, nil
+		}
 	}
 	return &stats.Timestamp, nil
 }
