@@ -14,6 +14,7 @@ import (
 type RsyncOptions struct {
 	Name    string   `json:"name"`
 	Backups int      `json:"backups"`
+	Rest    int      `json:"rest"`
 	Target  string   `json:"target"`
 	Files   []string `json:"files"`
 	Exclude []string `json:"exclude"`
@@ -68,8 +69,13 @@ func (r RsyncOptions) AllowBackup() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	// calculate backup resting period
+	RestPeriod := time.Hour
+	if r.Rest != 0 {
+		RestPeriod = time.Second * time.Duration(r.Rest)
+	}
 	// allow next backup to start at least one hour after the last one
-	return last.Add(time.Hour).Before(time.Now()), nil
+	return last.Add(RestPeriod).Before(time.Now()), nil
 }
 
 // Options generates options for running rsync
