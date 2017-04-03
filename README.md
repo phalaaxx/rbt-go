@@ -35,6 +35,18 @@ Configuration file names are provided with -f command line option. It is possibl
 Configuration files must be in JSON format and file names must end with .json extension, however it is not necessary to specify file extension with -f option. It will be appended if necessary.
 If the provided file name does not exist, RBT will try to also search for it in /etc/rbt directory.
 
+Configuration fields
+--
+
+Configuration files are in JSON format and have several fields to configure backup jobs. These are:
+
+* name - this is the name of the server that is to be backed up; it must be resolvable address because this is used to connect to the remote server
+* backups - the number of backup copies to keep; last (newest) backup copy is always in a directory $target/backup.0
+* rest - number of seconds between backups; if new backup is attempted before this time has passed since the last successful backup - nothing will happen
+* target - the root directory for server backups
+* files - list of files / directories names to copy from the remote server in backup directories
+* exclude - list of files / directories to exclude from backups
+
 Authentication
 --
 
