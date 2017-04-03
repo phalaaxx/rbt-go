@@ -127,6 +127,7 @@ func (r *RsyncOptions) SaveCompleted(duration int64) error {
 	defer File.Close()
 	// prepare completed data
 	stats := CompletedStats{
+		r.Name,
 		time.Now(),
 		duration,
 	}
