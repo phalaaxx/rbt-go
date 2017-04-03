@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
+	"path"
 	"strings"
 )
 
@@ -16,8 +18,26 @@ func (f *ConfigFiles) String() string {
 
 // Set adds a new value to the list
 func (f *ConfigFiles) Set(value string) error {
-	*f = append(*f, value)
-	return nil
+	// make sure file name ends in .json
+	if !strings.HasSuffix(value, ".json") {
+		value = fmt.Sprintf("%s.json", value)
+	}
+	// check if file exists
+	if _, err := os.Stat(value); err == nil {
+		*f = append(*f, value)
+		return nil
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	// does not exist, try in /etc/rbt
+	value = path.Clean(path.Join("/etc/rbt", value))
+	if _, err := os.Stat(value); err == nil {
+		*f = append(*f, value)
+		return nil
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+	return os.ErrNotExist
 }
 
 /* main program */
