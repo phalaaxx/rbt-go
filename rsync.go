@@ -18,6 +18,7 @@ type RsyncOptions struct {
 	Target  string   `json:"target"`
 	Files   []string `json:"files"`
 	Exclude []string `json:"exclude"`
+	Chown   string   `json:"chown"`
 }
 
 // GetTarget parses target string value
@@ -85,6 +86,10 @@ func (r *RsyncOptions) Options() []string {
 		"--delete",
 		"--stats",
 		fmt.Sprintf("--link-dest=%s", r.GetLastBackup()),
+	}
+	// chown user if Chown option is provided
+	if len(r.Chown) != 0 {
+		options = append(options, fmt.Sprintf("--chown=%s", r.Chown))
 	}
 	// add source files / directories
 	for _, dir := range r.Files {
