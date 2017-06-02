@@ -12,13 +12,14 @@ import (
 
 // RsyncOptions contains configuration options for rsync
 type RsyncOptions struct {
-	Name    string   `json:"name"`
-	Backups int      `json:"backups"`
-	Rest    int      `json:"rest"`
-	Target  string   `json:"target"`
-	Files   []string `json:"files"`
-	Exclude []string `json:"exclude"`
-	Chown   string   `json:"chown"`
+	Name      string   `json:"name"`
+	Backups   int      `json:"backups"`
+	Rest      int      `json:"rest"`
+	Target    string   `json:"target"`
+	Files     []string `json:"files"`
+	Exclude   []string `json:"exclude"`
+	Chown     string   `json:"chown"`
+	FakeSuper bool     `json:"fakesuper"`
 }
 
 // GetTarget parses target string value
@@ -85,12 +86,17 @@ func (r *RsyncOptions) Options() []string {
 		"-aR",
 		"--delete",
 		"--stats",
-		fmt.Sprintf("--link-dest=%s", r.GetLastBackup()),
+	}
+	// fake superuser
+	if r.FakeSuper {
+		options = append(options, "--fake-super")
 	}
 	// chown user if Chown option is provided
 	if len(r.Chown) != 0 {
 		options = append(options, fmt.Sprintf("--chown=%s", r.Chown))
 	}
+	// hardlink files from GetLastBackup directory
+	options = append(options, fmt.Sprintf("--link-dest=%s", r.GetLastBackup()))
 	// add source files / directories
 	for _, dir := range r.Files {
 		options = append(options, fmt.Sprintf("%s:%s", r.Name, dir))
