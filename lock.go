@@ -30,6 +30,11 @@ func DoLock(r *RsyncOptions) (err error) {
 		if err := File.Chmod(0644); err != nil {
 			return err
 		}
+		// close file and re-enter recursively
+		if err := File.Close(); err != nil {
+			return err
+		}
+		return DoLock(r)
 	}
 	// acquire lock on file
 	c := make(chan error)
