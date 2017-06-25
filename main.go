@@ -48,8 +48,12 @@ func main() {
 	flag.Parse()
 	// make sure there are file names provided
 	if len(files) == 0 {
-		fmt.Println("For usage use -h")
-		return
+		// if program name is not rbt this may indicate a symlink
+		if strings.HasSuffix(os.Args[0], "rbt") {
+			fmt.Println("For usage use -h")
+			return
+		}
+		files.Set(path.Base(os.Args[0]))
 	}
 	// run backup process for all provided arguments
 	for _, file := range files {
