@@ -12,9 +12,12 @@ import (
 var ETimeout = errors.New("timeout")
 
 // DoLock acquires a file lock to prevent double runs and then starts r.Run
-func DoLock(r *RsyncOptions) (err error) {
+func DoLock(r *RsyncOptions, verbose bool) (err error) {
 	// generate lock file name
 	LockFile := fmt.Sprintf("%s/backup.lock", r.GetTarget())
+	if verbose {
+		fmt.Printf("Using lock file %s\n", LockFile)
+	}
 	// open or create lock file if it does not yet exist
 	var File *os.File
 	if File, err = os.Open(LockFile); err != nil {
@@ -34,7 +37,7 @@ func DoLock(r *RsyncOptions) (err error) {
 		if err := File.Close(); err != nil {
 			return err
 		}
-		return DoLock(r)
+		return DoLock(r, verbose)
 	}
 	// acquire lock on file
 	c := make(chan error)
@@ -58,7 +61,7 @@ func DoLock(r *RsyncOptions) (err error) {
 			return err
 		}
 		// run backup procedure and return
-		return r.Run()
+		return r.Run(verbose)
 	case <-time.After(time.Second * 60):
 		// timeout, handle properly
 		go DoUnlockFile()

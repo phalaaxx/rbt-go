@@ -44,7 +44,9 @@ func (f *ConfigFiles) Set(value string) error {
 func main() {
 	// parse command line flags
 	var files ConfigFiles
+	var verbose bool
 	flag.Var(&files, "f", "Backup configuration file.")
+	flag.BoolVar(&verbose, "v", false, "Verbose output.")
 	flag.Parse()
 	// make sure there are file names provided
 	if len(files) == 0 {
@@ -73,7 +75,7 @@ func main() {
 			fmt.Printf("AllowBackup(): %s: %v\n", rsync.Name, err)
 			continue
 		} else if allow {
-			if err := DoLock(rsync); err != nil {
+			if err := DoLock(rsync, verbose); err != nil {
 				fmt.Printf("DoLock(): %s: %v\n", rsync.Name, err)
 				continue
 			}

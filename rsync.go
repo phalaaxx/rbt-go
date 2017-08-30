@@ -161,11 +161,14 @@ func (r *RsyncOptions) SaveCompleted(duration int64) error {
 }
 
 // Run rsync data transfer and rotate directories on success
-func (r *RsyncOptions) Run() error {
+func (r *RsyncOptions) Run(verbose bool) error {
 	// prepare rsync command
 	cmd := exec.Command(
 		"/usr/bin/rsync",
 		r.Options()...)
+	if verbose {
+		fmt.Printf("Rsync Command:\n%v\n", cmd)
+	}
 	// get start time
 	StartTime := time.Now().Unix()
 	// start rsync to transfer data
